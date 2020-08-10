@@ -12,7 +12,7 @@ def fromCSVtoDF(csvpath):
         print("Error: File does not appear to exist.")
 
     dfData = pd.DataFrame(dtype=float)
-    dfData['date'] = pd.to_datetime(csv_data['Fecha'],format='%d-%m-%Y %H:%M')
+    dfData['date'] = pd.to_datetime(csv_data['Fecha'], format='%d-%m-%Y %H:%M')
     # dfData['ppn'] = csv_data['Registro de Lluvia [mm]']
     dfData['Temp'] = csv_data['Temperatura [°C]']
 
@@ -26,6 +26,7 @@ def getAWSvsWRF(dfWRF, dfAWS, awsname, param):
     y los guarda en un dataframe dfTmp
     """
     dfTmp = pd.DataFrame()
+    fieldname = f'WRF_{awsname}_{param}'
 
     for index, Temp in dfWRF.iterrows():
         try:
@@ -35,7 +36,7 @@ def getAWSvsWRF(dfWRF, dfAWS, awsname, param):
             continue
 
         dfTmp = dfTmp.append({'date': index,
-                              'f"WRF_{awsname}_{param}"': float(Temp[0]),
+                              fieldname: float(Temp[0]),
                               'AWS': float(a['Temp'])},
                              ignore_index=True)
 
@@ -53,7 +54,7 @@ def getMetricas(dfWRF_AWS, awsname, param):
 
     mae = np.sum(np.absolute(error))/error.size
 
-    dfError = pd.DataFrame({'date': dfWRF_AWS['date'], 'WRF_60_A': error})
+    dfError = pd.DataFrame({'date': dfWRF_AWS['date'], f'WRF_{awsname}_{param}': error})
     data = dfError.groupby([dfError["date"].dt.hour]).mean()
 
     return data, rmse, mae
