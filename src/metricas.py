@@ -2,6 +2,25 @@ import numpy as np
 import pandas as pd
 
 
+def fromCSVtoDF(csvpath):
+    """ Obtirene un path a un csv de una AWS
+    y lo convierte en un df con su valores en float
+    """
+    try:
+        csv_data = pd.read_csv(csvpath)
+    except IOError:
+        print("Error: File does not appear to exist.")
+
+    dfData = pd.DataFrame(dtype=float)
+    dfData['date'] = pd.to_datetime(csv_data['Fecha'],format='%d-%m-%Y %H:%M')
+    # dfData['ppn'] = csv_data['Registro de Lluvia [mm]']
+    dfData['Temp'] = csv_data['Temperatura [°C]']
+
+    dfData['Temp'] = dfData['Temp'].astype(float)
+
+    return dfData.set_index('date')
+
+
 def getAWSvsWRF(dfWRF, dfAWS, awsname, param):
     """ Utilizando los indexes, arma pares WRF-AWS
     y los guarda en un dataframe dfTmp
@@ -21,6 +40,7 @@ def getAWSvsWRF(dfWRF, dfAWS, awsname, param):
                              ignore_index=True)
 
     return dfTmp
+
 
 def getMetricas(dfWRF_AWS, awsname, param):
     """ Esta funcion obtiene un dataframe con WRF y AWS en un punto
