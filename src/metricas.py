@@ -54,7 +54,8 @@ def getMetricas(dfWRF_AWS, awsname, param):
 
     mae = np.sum(np.absolute(error))/error.size
 
-    dfError = pd.DataFrame({'date': dfWRF_AWS['date'], f'WRF_{awsname}_{param}': error})
+    dfError = pd.DataFrame({'date': dfWRF_AWS['date'],
+                           f'WRF_{awsname}_{param}': error})
     data = dfError.groupby([dfError["date"].dt.hour]).mean()
 
     return data, rmse, mae
