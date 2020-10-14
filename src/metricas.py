@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from functools import reduce
 
 
 def fromCSVtoDF(csvpath):
@@ -12,7 +13,8 @@ def fromCSVtoDF(csvpath):
         print("Error: File does not appear to exist.")
 
     dfData = pd.DataFrame(dtype=float)
-    dfData['date'] = pd.to_datetime(csv_data['Fecha'], format='%d-%m-%Y %H:%M')
+    dfData['date'] = pd.to_datetime(csv_data['Fecha'],
+                                    format='%d-%m-%Y %H:%M') + pd.Timedelta(hours=3)
     # dfData['ppn'] = csv_data['Registro de Lluvia [mm]']
     dfData['Temp'] = csv_data['Temperatura [°C]']
 
@@ -59,3 +61,16 @@ def getMetricas(dfWRF_AWS, awsname, param):
     data = dfError.groupby([dfError["date"].dt.hour]).mean()
 
     return data, rmse, mae
+
+
+def getMeanHourly(dataA, dataB, dataC, dataD):
+    """ Esta función obtiene la media por hora
+    para los cuatro dataframe de error por
+    parametrización
+    """
+    data_frames = [dataA, dataB, dataC, dataD]
+    df_merged = reduce(lambda left, right: pd.merge(left, right,
+                       on=['date'], how='outer'), data_frames)
+    mean = np.mean(df_merged, axis=1)
+
+    return pd.DataFrame(mean, columns=['mean'])
