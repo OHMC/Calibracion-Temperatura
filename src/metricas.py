@@ -32,14 +32,14 @@ def getAWSvsWRF(dfWRF, dfAWS, awsname, param):
 
     for index, Temp in dfWRF.iterrows():
         try:
-            a = dfAWS.loc[index]
+            awsT = dfAWS.loc[index]
         except KeyError as error:
             print(f"Index Error: {error}")
             continue
 
         dfTmp = dfTmp.append({'date': index,
                               fieldname: float(Temp[0]),
-                              'AWS': float(a['Temp'])},
+                              'AWS': float(awsT['Temp'])},
                              ignore_index=True)
 
     return dfTmp
